@@ -1,4 +1,4 @@
-module github.com/ross96d/echohuma
+module github.com/ross96D/echohuma
 
 go 1.21.0
 
