@@ -12,23 +12,41 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type echoAdapter struct {
-	router *echo.Router
+// type EchoRouter struct {
+// 	router *echo.Group
+// }
+
+// func (e EchoRouter) Handle(op *huma.Operation, handler func(ctx huma.Context)) {
+// 	e.router.Add(op.Method, op.Path, func(c echo.Context) error {
+// 		handler(NewContext(op, c))
+// 		return nil
+// 	})
+// }
+
+type EchoAdapter struct {
+	app *echo.Echo
 }
 
-func (e echoAdapter) Handle(op *huma.Operation, handler func(ctx huma.Context)) {
-	e.router.Add(op.Method, op.Path, func(c echo.Context) error {
+func (e EchoAdapter) Handle(op *huma.Operation, handler func(ctx huma.Context)) {
+	e.app.Add(op.Method, op.Path, func(c echo.Context) error {
 		handler(NewContext(op, c))
 		return nil
 	})
 }
 
-func (e echoAdapter) ServeHTTP(http.ResponseWriter, *http.Request) {
-
+func (e EchoAdapter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	e.app.ServeHTTP(w, r)
 }
 
-func New(r *echo.Router, config huma.Config) huma.API {
-	return huma.NewAPI(config, echoAdapter{router: r})
+// func (e EchoAdapter) Group(prefix string, m ...echo.MiddlewareFunc) EchoRouter {
+// 	g := e.app.Group(prefix, m...)
+// 	return EchoRouter{
+// 		router: g,
+// 	}
+// }
+
+func New(r *echo.Echo, config huma.Config) huma.API {
+	return huma.NewAPI(config, EchoAdapter{app: r})
 }
 
 type echoCtx struct {
